@@ -1,0 +1,85 @@
+we write this code in component.ts where we want to create form 
+import { FormControl, Validators, FormBuilder, FormGroup } from "@angular/forms";
+
+loginForm;
+  submitted = false;
+
+  constructor(private fb: FormBuilder, private _common: CommonService, private _user: UserService, private router: Router, private notify: NotificationService) {
+
+  }
+
+
+
+  ngOnInit() {
+    this._common.loadScript();
+
+    this.loginForm = this.fb.group({
+      username: [
+        "",
+        [
+          Validators.required,
+          CustomValidators.validateCharacters
+
+        ]
+      ],
+      password: ["", [Validators.required, CustomValidators.validateCharacters]]
+    });
+  }
+
+  login() {
+    this.submitted = true;
+    if (this.loginForm.valid) {
+      let obj = {}
+      obj = this.loginForm.value
+
+      this._user.login(obj).subscribe(
+
+        (response: any) => {
+            console.log(response.user_id)
+            localStorage.setItem('user_id', response['user_id'])
+            this.router.navigate(["/dashboard"]);
+            this.notify.showNotification('success', 'login successfully')
+        },
+        (error: Error) => {
+          console.log(error)
+          this.notify.showNotification('error', error['error'].message)
+        }
+      )
+    }
+  }
+
+
+
+
+
+HTML file
+<form [formGroup]="loginForm" (ngSubmit)="login()">
+            <div class="div-group has-feedback">
+                <input type="email" class="form-control" placeholder="Email" formControlName="username">
+                <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+                <span class="isValid" *ngIf="submitted && loginForm.controls.username.hasError('required')">Username is
+            required.</span>
+                <span class="isValid" *ngIf="loginForm.controls.username.hasError('whitespace')">Username is not in correct
+            format.</span>
+            </div>
+            <br>
+
+            <div class="form-group has-feedback">
+                <input type="password" class="form-control" placeholder="Password" formControlName="password">
+                <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+                <span class="isValid" *ngIf="submitted && loginForm.controls.password.hasError('required')">Password is
+            required.</span>
+                <span class="isValid" *ngIf="loginForm.controls.password.hasError('whitespace')">Password is not in correct
+            format.</span>
+            </div>
+            <div class="row">
+                <div class="col-xs-8">
+
+                </div>
+                <!-- /.col -->
+                <div class="col-xs-4">
+                    <button type="submit" class="btn btn-primary btn-block btn-flat">Sign In</button>
+                </div>
+                <!-- /.col -->
+            </div>
+        </form>
