@@ -1,0 +1,111 @@
+
+
+import datatable module and also import all libraries of datatable
+import { DataTablesModule } from 'angular-datatables';
+
+use this html code for showing data in tabuler form with for loop
+ <table id="example2" datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>User_id</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone_number</th>
+                                    <th>status</th>
+                                    <th>Created_at</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let user of person">
+                                    <td>{{ user.id }}</td>
+                                    <td>{{ user.name }}</td>
+                                    <td>{{ user.email }}</td>
+                                    <td>{{ user.phone_number }}</td>
+                                    
+   
+   
+   ***** code for geting data export class ManageUsersComponent implements OnDestroy, OnInit {
+  person = []; // array to store value coming from beck end api user data to show
+  submitted = false;
+  dtOptions: DataTables.Settings = {};
+  dtTrigger: Subject<any> = new Subject<any>();
+  @ViewChild(DataTableDirective,{static: false})
+  dtElement: DataTableDirective;
+  constructor(private _user: UserService, private router: Router,private notify:NotificationService) { }
+
+  ngOnInit() {
+    this.getUserData()
+  }
+
+
+  getUserData() {
+    this.submitted = true;
+    this.dtOptions = {
+      pagingType: 'full_numbers',
+      pageLength: 10
+    };
+    this._user.getUserData().subscribe(
+      (response: any) => {
+        
+        this.person = response['data']
+        this.dtTrigger.next();
+      },
+      (error: Error) => {
+      }
+    )
+  }
+  
+  
+  
+   rerender(): void {
+    this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
+      // Destroy the table first
+      dtInstance.destroy();
+      // Call the dtTrigger to rerender again
+      this.dtTrigger.next();
+    });
+  }
+
+
+  ngOnDestroy(): void {
+    // Do not forget to unsubscribe the event
+    this.dtTrigger.unsubscribe();
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  ****to make switch button use this
+  make on_status_changethis method in any service
+  on_status_change(data) {
+  return this._http.post(`${this.requestBaseUrl}/on/change/status`, data);
+    }
+    
+    
+   //// this is ts code
+  on_status_change(status,userId) {
+   let data ={}
+   data['status']=status
+   data['userId']=userId
+    this._user.on_status_change(data).subscribe(
+      (response: any) => {
+        this.rerender();
+             },
+      (error: Error) => {
+      }
+    )
+  }
+  
+  
+  html code
+  <td>
+               <ui-switch [checked]="user.status=='active'" (change)="on_status_change(user.status,user.id)"></ui-switch>
+                                    </td>
+  
+  
+  
