@@ -1,0 +1,46 @@
+first use this tag in component html for showing notification box 
+
+apply this on any button where you want to show 
+just call shownotification method on particullar like login method when call not change html 
+
+
+<notifier-container></notifier-container>
+
+//////////create a service for notification showing
+import { NotifierService } from 'angular-notifier'; also import in appmodule
+export class NotificationService {
+  private notifier: NotifierService;
+  constructor(notifier: NotifierService) {
+    this.notifier = notifier;
+  }
+
+
+  public showNotification(type: string, message: string): void {
+    console.log(type,message)
+    this.notifier.notify(type, message);
+  }
+
+}
+
+///use shownotification method where you want to show notification 
+first import service 
+import { NotificationService } from "../services/notification.service"
+use this in constructor
+ private notify: NotificationService
+ 
+ this.notify.showNotification('success', 'login successfully')
+ 
+ 
+ 
+ 
+ for going one component to another we use this  
+  this.router.navigate(["/dashboard"]); import route first 
+  
+  we can also html to go another component
+  
+  td>
+                                        <a [routerLink]="['/viewuserdetail',user.id]" title="View user detail"> <i class="fa fa-eye" aria-hidden="true"></i></a>
+                                    </td>
+  
+  
+  u
